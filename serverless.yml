@@ -78,6 +78,15 @@ custom:
   eventBusName: medical-appointments-bus-${self:provider.stage}
 
 functions:
+  # Lambda root: página de inicio con información de la API
+  root:
+    handler: src/presentation/handlers/root.handler
+    events:
+      - http:
+          path: /
+          method: get
+          cors: true
+
   # Lambda principal: recibe peticiones y maneja el ciclo completo
   appointment:
     handler: src/presentation/handlers/appointment.handler
