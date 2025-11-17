@@ -7,6 +7,7 @@ import { DynamoDBAppointmentRepository } from '../../infrastructure/repositories
 import { SNSPublisher } from '../../infrastructure/messaging/SNSPublisher';
 import { CreateAppointmentUseCase } from '../../application/use-cases/CreateAppointmentUseCase';
 import { GetAppointmentsByInsuredUseCase } from '../../application/use-cases/GetAppointmentsByInsuredUseCase';
+import { UpdateAppointmentStatusUseCase } from '../../application/use-cases/UpdateAppointmentStatusUseCase';
 
 const repository = new DynamoDBAppointmentRepository();
 const publisher = new SNSPublisher();
@@ -15,6 +16,9 @@ const createAppointmentUseCase = new CreateAppointmentUseCase(
   publisher
 );
 const getAppointmentsByInsuredUseCase = new GetAppointmentsByInsuredUseCase(
+  repository
+);
+const updateAppointmentStatusUseCase = new UpdateAppointmentStatusUseCase(
   repository
 );
 
@@ -147,7 +151,20 @@ async function handleSQSEvent(event: SQSEvent): Promise<void> {
   for (const record of event.Records) {
     try {
       const message = JSON.parse(record.body);
-      console.log('Processing appointment completion:', message);
+      
+      if (message.detail) {
+        const detail = message.detail;
+        console.log('Processing appointment completion:', detail);
+
+        await updateAppointmentStatusUseCase.execute({
+          appointmentId: detail.appointmentId,
+          status: 'completed',
+        });
+
+        console.log(
+          `Updated appointment ${detail.appointmentId} to completed`
+        );
+      }
     } catch (error) {
       console.error('Error processing SQS message:', error);
     }
