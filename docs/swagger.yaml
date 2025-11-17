@@ -1,0 +1,234 @@
+openapi: 3.0.3
+info:
+  title: Medical Rimac Appointments API
+  description: |
+    Sistema de agendamiento de citas médicas para asegurados de Perú y Chile.
+    
+    Arquitectura serverless en AWS con:
+    - API Gateway
+    - AWS Lambda
+    - DynamoDB
+    - SNS/SQS
+    - EventBridge
+  version: 1.0.0
+  contact:
+    name: Medical Rimac Team
+    email: support@medicalrimac.com
+
+servers:
+  - url: https://api.medicalrimac.com/dev
+    description: Development environment
+  - url: https://api.medicalrimac.com/prod
+    description: Production environment
+
+tags:
+  - name: Appointments
+    description: Operaciones de agendamiento de citas
+
+paths:
+  /appointments:
+    post:
+      tags:
+        - Appointments
+      summary: Crear nuevo agendamiento
+      description: |
+        Registra un nuevo agendamiento de cita médica. 
+        El agendamiento se procesa de forma asíncrona según el país del asegurado.
+      operationId: createAppointment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAppointmentRequest'
+            examples:
+              peru:
+                summary: Ejemplo para Perú
+                value:
+                  insuredId: "00123"
+                  scheduleId: 100
+                  countryISO: "PE"
+              chile:
+                summary: Ejemplo para Chile
+                value:
+                  insuredId: "00456"
+                  scheduleId: 200
+                  countryISO: "CL"
+      responses:
+        '202':
+          description: Agendamiento en proceso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAppointmentResponse'
+              example:
+                message: "El agendamiento está en proceso"
+                appointmentId: "123e4567-e89b-12d3-a456-426614174000"
+        '400':
+          description: Error de validación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Bad Request"
+                message: "Insured ID must be exactly 5 digits"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /appointments/{insuredId}:
+    get:
+      tags:
+        - Appointments
+      summary: Obtener agendamientos por asegurado
+      description: |
+        Retorna todos los agendamientos de un asegurado específico,
+        incluyendo su estado actual (pending o completed).
+      operationId: getAppointmentsByInsured
+      parameters:
+        - name: insuredId
+          in: path
+          required: true
+          description: Código del asegurado (5 dígitos)
+          schema:
+            type: string
+            pattern: '^\d{5}$'
+          example: "00123"
+      responses:
+        '200':
+          description: Lista de agendamientos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAppointmentsResponse'
+              example:
+                appointments:
+                  - appointmentId: "123e4567-e89b-12d3-a456-426614174000"
+                    insuredId: "00123"
+                    scheduleId: 100
+                    countryISO: "PE"
+                    status: "completed"
+                    createdAt: "2024-11-17T10:00:00Z"
+                    updatedAt: "2024-11-17T10:05:00Z"
+                  - appointmentId: "987e6543-b21c-34d5-a654-123456789abc"
+                    insuredId: "00123"
+                    scheduleId: 150
+                    countryISO: "PE"
+                    status: "pending"
+                    createdAt: "2024-11-17T11:00:00Z"
+                    updatedAt: "2024-11-17T11:00:00Z"
+        '400':
+          description: Error de validación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "Bad Request"
+                message: "Invalid insuredId"
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    CreateAppointmentRequest:
+      type: object
+      required:
+        - insuredId
+        - scheduleId
+        - countryISO
+      properties:
+        insuredId:
+          type: string
+          pattern: '^\d{5}$'
+          description: Código del asegurado (5 dígitos, puede tener ceros adelante)
+          example: "00123"
+        scheduleId:
+          type: integer
+          minimum: 1
+          description: Identificador del espacio de agendamiento
+          example: 100
+        countryISO:
+          type: string
+          enum: [PE, CL]
+          description: Código ISO del país (PE=Perú, CL=Chile)
+          example: "PE"
+
+    CreateAppointmentResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Mensaje confirmando el procesamiento
+          example: "El agendamiento está en proceso"
+        appointmentId:
+          type: string
+          format: uuid
+          description: Identificador único del agendamiento
+          example: "123e4567-e89b-12d3-a456-426614174000"
+
+    AppointmentDTO:
+      type: object
+      properties:
+        appointmentId:
+          type: string
+          format: uuid
+          description: Identificador único del agendamiento
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        insuredId:
+          type: string
+          pattern: '^\d{5}$'
+          description: Código del asegurado
+          example: "00123"
+        scheduleId:
+          type: integer
+          description: Identificador del espacio de agendamiento
+          example: 100
+        countryISO:
+          type: string
+          enum: [PE, CL]
+          description: Código ISO del país
+          example: "PE"
+        status:
+          type: string
+          enum: [pending, completed]
+          description: Estado del agendamiento
+          example: "completed"
+        createdAt:
+          type: string
+          format: date-time
+          description: Fecha y hora de creación (ISO 8601)
+          example: "2024-11-17T10:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Fecha y hora de última actualización (ISO 8601)
+          example: "2024-11-17T10:05:00Z"
+
+    GetAppointmentsResponse:
+      type: object
+      properties:
+        appointments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppointmentDTO'
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Tipo de error
+          example: "Bad Request"
+        message:
+          type: string
+          description: Mensaje descriptivo del error
+          example: "Insured ID must be exactly 5 digits"

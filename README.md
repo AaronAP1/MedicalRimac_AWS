@@ -198,10 +198,50 @@ Las siguientes variables se configuran automáticamente en el `serverless.yml`:
 ## 📝 Notas Importantes
 
 - El RDS debe ser creado manualmente y las credenciales configuradas
-- Los lambdas PE y CL inicialmente usan mocks para RDS
+- Los lambdas PE y CL inicialmente usan mocks para RDS (in-memory)
 - El sistema valida que `countryISO` solo sea "PE" o "CL"
 - El `insuredId` debe tener exactamente 5 dígitos
 - Todas las fechas se manejan en formato ISO 8601
+
+## 🗄️ Configuración RDS MySQL (Opcional)
+
+El proyecto incluye mocks para RDS. Para usar base de datos real:
+
+### 1. Crear RDS en AWS Console o CLI
+
+```bash
+aws rds create-db-instance \
+  --db-instance-identifier medical-appointments-db \
+  --db-instance-class db.t3.micro \
+  --engine mysql \
+  --master-username admin \
+  --master-user-password YourSecurePassword \
+  --allocated-storage 20 \
+  --vpc-security-group-ids sg-xxxxx \
+  --db-subnet-group-name default
+```
+
+### 2. Ejecutar script de schema
+
+```bash
+mysql -h your-rds-endpoint.rds.amazonaws.com -u admin -p < database/schema.sql
+```
+
+### 3. Configurar variables de entorno
+
+Agregar en `serverless.yml` bajo `provider.environment`:
+
+```yaml
+DB_HOST: ${env:DB_HOST}
+DB_USER: ${env:DB_USER}
+DB_PASSWORD: ${env:DB_PASSWORD}
+DB_NAME_PE: db_pe
+DB_NAME_CL: db_cl
+```
+
+### 4. Implementar RDS Repository
+
+Reemplazar `MockCountryAppointmentRepository` con implementación real usando `mysql2`.
 
 ## 🧪 Testing
 
@@ -215,9 +255,46 @@ npm test
 npm run test:coverage
 ```
 
+Actualmente: **31 tests pasando** ✅
+
 ## 📚 Documentación API
 
-La documentación completa en formato OpenAPI/Swagger estará disponible en `/docs` después del despliegue.
+La documentación completa en formato OpenAPI/Swagger está disponible en:
+- `docs/swagger.yaml`
+- Visualizar en: https://editor.swagger.io/
+
+### Endpoints disponibles:
+
+**POST /appointments**
+- Crear nuevo agendamiento
+- Body: `{ insuredId, scheduleId, countryISO }`
+- Response: `202 Accepted`
+
+**GET /appointments/{insuredId}**
+- Obtener agendamientos por asegurado
+- Response: Lista de appointments con estados
+
+## 🚀 Deploy a AWS
+
+```bash
+# Deploy a desarrollo
+npm run deploy:dev
+
+# Deploy a producción
+npm run deploy:prod
+
+# Eliminar stack
+npm run remove
+```
+
+### Recursos creados automáticamente:
+- API Gateway REST API
+- 3 Lambda Functions
+- DynamoDB Table con GSI
+- SNS Topic con subscriptions
+- 3 SQS Queues con políticas
+- EventBridge Event Bus con reglas
+- IAM Roles y Policies
 
 ## 🤝 Contribución
 
@@ -228,5 +305,17 @@ Este proyecto sigue las convenciones de commit de Conventional Commits:
 - `docs:` Cambios en documentación
 - `test:` Añadir o modificar tests
 - `refactor:` Refactorización de código
+- `chore:` Configuración y herramientas
+
+## 📊 Estructura de Commits
+
+```
+a99bab0 - feat: actualización de estado con EventBridge
+e5d09a6 - feat: lambda Chile con procesamiento SQS
+40cc145 - feat: lambda Peru con SQS y EventBridge
+b5e190f - feat: integración SNS con filtros por país
+36c0192 - feat: implementación lambda appointment con DynamoDB
+a4d2f18 - chore: configuración inicial del proyecto
+```
 
 **Autor**: Aaron Aquino Poma Dev 
