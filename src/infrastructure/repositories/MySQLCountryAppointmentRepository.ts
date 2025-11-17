@@ -5,7 +5,7 @@ import { ICountryAppointmentRepository } from '../../domain/repositories/ICountr
 export class MySQLCountryAppointmentRepository implements ICountryAppointmentRepository {
   private pool: mysql.Pool;
 
-  constructor(private readonly dbName: string) {
+  constructor(dbName: string) {
     this.pool = mysql.createPool({
       host: process.env.DB_HOST!,
       user: process.env.DB_USER!,
