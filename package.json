@@ -1,0 +1,61 @@
+{
+  "name": "medical-rimac-appointments",
+  "version": "1.0.0",
+  "description": "Sistema de agendamiento de citas médicas para Perú y Chile usando AWS Serverless",
+  "main": "index.js",
+  "scripts": {
+    "dev": "serverless offline",
+    "build": "tsc",
+    "deploy": "serverless deploy",
+    "deploy:dev": "serverless deploy --stage dev",
+    "deploy:prod": "serverless deploy --stage prod",
+    "remove": "serverless remove",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\"",
+    "logs": "serverless logs -f appointment -t"
+  },
+  "keywords": [
+    "aws",
+    "serverless",
+    "lambda",
+    "typescript",
+    "medical",
+    "appointments"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.158",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.10.1",
+    "@types/uuid": "^11.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.46.4",
+    "@typescript-eslint/parser": "^8.46.4",
+    "esbuild": "^0.25.12",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "jest": "^30.2.0",
+    "prettier": "^3.6.2",
+    "serverless": "^4.23.0",
+    "serverless-esbuild": "^1.55.2",
+    "serverless-offline": "^14.4.0",
+    "ts-jest": "^29.4.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.932.0",
+    "@aws-sdk/client-eventbridge": "^3.932.0",
+    "@aws-sdk/client-sns": "^3.932.0",
+    "@aws-sdk/client-sqs": "^3.932.0",
+    "@aws-sdk/lib-dynamodb": "^3.932.0",
+    "mysql2": "^3.15.3",
+    "uuid": "^13.0.0"
+  }
+}
