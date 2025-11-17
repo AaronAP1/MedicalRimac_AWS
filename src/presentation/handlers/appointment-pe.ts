@@ -1,9 +1,9 @@
 import { SQSEvent } from 'aws-lambda';
-import { MockCountryAppointmentRepository } from '../../infrastructure/repositories/MockCountryAppointmentRepository';
+import { MySQLCountryAppointmentRepository } from '../../infrastructure/repositories/MySQLCountryAppointmentRepository';
 import { EventBridgePublisher } from '../../infrastructure/messaging/EventBridgePublisher';
 import { ProcessCountryAppointmentUseCase } from '../../application/use-cases/ProcessCountryAppointmentUseCase';
 
-const countryRepository = new MockCountryAppointmentRepository();
+const countryRepository = new MySQLCountryAppointmentRepository('db_pe');
 const eventPublisher = new EventBridgePublisher();
 const processAppointmentUseCase = new ProcessCountryAppointmentUseCase(
   countryRepository,

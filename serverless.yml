@@ -18,6 +18,10 @@ provider:
     SQS_CL_URL: !Ref AppointmentsCLQueue
     SQS_RESPONSE_URL: !Ref AppointmentsResponseQueue
     EVENT_BUS_NAME: ${self:custom.eventBusName}
+    DB_HOST: medical-appointments-db.cluster-cmru8iaecv1l.us-east-1.rds.amazonaws.com
+    DB_USER: admin
+    DB_PASSWORD: kwugHLb4IWxxnTXstfJg
+    DB_PORT: 3306
   iam:
     role:
       statements:
