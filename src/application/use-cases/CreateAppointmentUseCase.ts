@@ -29,7 +29,11 @@ export class CreateAppointmentUseCase {
       appointmentId,
       dto.insuredId,
       dto.scheduleId,
-      dto.countryISO
+      dto.countryISO,
+      dto.centerId,
+      dto.specialtyId,
+      dto.medicId,
+      dto.appointmentDate
     );
 
     await this.appointmentRepository.save(appointment);
@@ -40,6 +44,10 @@ export class CreateAppointmentUseCase {
         scheduleId: dto.scheduleId,
         countryISO: dto.countryISO,
         appointmentId,
+        centerId: dto.centerId,
+        specialtyId: dto.specialtyId,
+        medicId: dto.medicId,
+        appointmentDate: dto.appointmentDate,
       },
       {
         countryISO: dto.countryISO,

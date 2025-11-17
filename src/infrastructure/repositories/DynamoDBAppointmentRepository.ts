@@ -30,6 +30,10 @@ export class DynamoDBAppointmentRepository implements IAppointmentRepository {
         scheduleId: appointment.scheduleId,
         countryISO: appointment.countryISO,
         status: appointment.status,
+        centerId: appointment.centerId,
+        specialtyId: appointment.specialtyId,
+        medicId: appointment.medicId,
+        appointmentDate: appointment.appointmentDate,
         createdAt: appointment.createdAt,
         updatedAt: appointment.updatedAt,
       },
@@ -56,6 +60,10 @@ export class DynamoDBAppointmentRepository implements IAppointmentRepository {
       result.Item.scheduleId,
       result.Item.countryISO,
       result.Item.status,
+      result.Item.centerId,
+      result.Item.specialtyId,
+      result.Item.medicId,
+      result.Item.appointmentDate,
       result.Item.createdAt,
       result.Item.updatedAt
     );
@@ -85,6 +93,10 @@ export class DynamoDBAppointmentRepository implements IAppointmentRepository {
           item.scheduleId,
           item.countryISO,
           item.status,
+          item.centerId,
+          item.specialtyId,
+          item.medicId,
+          item.appointmentDate,
           item.createdAt,
           item.updatedAt
         )

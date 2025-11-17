@@ -20,8 +20,12 @@ export class GetAppointmentsByInsuredUseCase {
       scheduleId: apt.scheduleId,
       countryISO: apt.countryISO,
       status: apt.status,
-      createdAt: apt.createdAt,
-      updatedAt: apt.updatedAt,
+      centerId: apt.centerId,
+      specialtyId: apt.specialtyId,
+      medicId: apt.medicId,
+      appointmentDate: apt.appointmentDate,
+      createdAt: apt.createdAt || '',
+      updatedAt: apt.updatedAt || '',
     }));
 
     return {

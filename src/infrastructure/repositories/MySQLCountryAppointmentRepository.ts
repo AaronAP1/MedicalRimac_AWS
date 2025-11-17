@@ -31,10 +31,10 @@ export class MySQLCountryAppointmentRepository implements ICountryAppointmentRep
       appointment.insuredId,
       appointment.scheduleId,
       appointment.countryISO,
-      null,
-      null,
-      null,
-      null,
+      appointment.centerId || null,
+      appointment.specialtyId || null,
+      appointment.medicId || null,
+      appointment.appointmentDate || null,
     ]);
   }
 
