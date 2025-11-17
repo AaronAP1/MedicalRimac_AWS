@@ -229,11 +229,4 @@ Este proyecto sigue las convenciones de commit de Conventional Commits:
 - `test:` Añadir o modificar tests
 - `refactor:` Refactorización de código
 
-## 📄 Licencia
-
-ISC
-
----
-
-**Autor**: Medical Rimac Team  
-**Versión**: 1.0.0
+**Autor**: Aaron Aquino Poma Dev 
