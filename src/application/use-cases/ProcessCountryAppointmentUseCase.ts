@@ -14,6 +14,10 @@ export class ProcessCountryAppointmentUseCase {
         appointmentId: dto.appointmentId,
         insuredId: dto.insuredId,
         scheduleId: dto.scheduleId,
+        centerId: dto.centerId,
+        specialtyId: dto.specialtyId,
+        medicId: dto.medicId,
+        appointmentDate: dto.appointmentDate,
       },
       dto.countryISO
     );

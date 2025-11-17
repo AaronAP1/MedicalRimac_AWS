@@ -18,7 +18,7 @@ export class MySQLCountryAppointmentRepository implements ICountryAppointmentRep
     });
   }
 
-  async save(appointment: Appointment): Promise<void> {
+  async save(data: any, countryISO: string): Promise<void> {
     const query = `
       INSERT INTO appointments (
         appointment_id, insured_id, schedule_id, country_iso,
@@ -27,14 +27,14 @@ export class MySQLCountryAppointmentRepository implements ICountryAppointmentRep
     `;
 
     await this.pool.execute(query, [
-      appointment.appointmentId,
-      appointment.insuredId,
-      appointment.scheduleId,
-      appointment.countryISO,
-      appointment.centerId || null,
-      appointment.specialtyId || null,
-      appointment.medicId || null,
-      appointment.appointmentDate || null,
+      data.appointmentId,
+      data.insuredId,
+      data.scheduleId,
+      countryISO,
+      data.centerId !== undefined ? data.centerId : null,
+      data.specialtyId !== undefined ? data.specialtyId : null,
+      data.medicId !== undefined ? data.medicId : null,
+      data.appointmentDate !== undefined ? data.appointmentDate : null,
     ]);
   }
 

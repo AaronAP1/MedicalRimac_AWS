@@ -23,6 +23,10 @@ export const handler = async (event: SQSEvent): Promise<void> => {
         insuredId: message.insuredId,
         scheduleId: message.scheduleId,
         countryISO: 'CL',
+        centerId: message.centerId,
+        specialtyId: message.specialtyId,
+        medicId: message.medicId,
+        appointmentDate: message.appointmentDate,
       });
 
       console.log(

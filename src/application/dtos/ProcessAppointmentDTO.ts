@@ -3,4 +3,8 @@ export interface ProcessAppointmentDTO {
   insuredId: string;
   scheduleId: number;
   countryISO: string;
+  centerId?: number;
+  specialtyId?: number;
+  medicId?: number;
+  appointmentDate?: string;
 }
