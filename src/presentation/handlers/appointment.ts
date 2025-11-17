@@ -4,11 +4,16 @@ import {
   SQSEvent,
 } from 'aws-lambda';
 import { DynamoDBAppointmentRepository } from '../../infrastructure/repositories/DynamoDBAppointmentRepository';
+import { SNSPublisher } from '../../infrastructure/messaging/SNSPublisher';
 import { CreateAppointmentUseCase } from '../../application/use-cases/CreateAppointmentUseCase';
 import { GetAppointmentsByInsuredUseCase } from '../../application/use-cases/GetAppointmentsByInsuredUseCase';
 
 const repository = new DynamoDBAppointmentRepository();
-const createAppointmentUseCase = new CreateAppointmentUseCase(repository);
+const publisher = new SNSPublisher();
+const createAppointmentUseCase = new CreateAppointmentUseCase(
+  repository,
+  publisher
+);
 const getAppointmentsByInsuredUseCase = new GetAppointmentsByInsuredUseCase(
   repository
 );

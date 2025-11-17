@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Appointment } from '../../domain/entities/Appointment';
 import { IAppointmentRepository } from '../../domain/repositories/IAppointmentRepository';
+import { IMessagePublisher } from '../../domain/repositories/IMessagePublisher';
 import {
   CreateAppointmentDTO,
   AppointmentResponseDTO,
@@ -9,7 +10,10 @@ import { InsuredId } from '../../domain/value-objects/InsuredId';
 import { CountryISO } from '../../domain/value-objects/CountryISO';
 
 export class CreateAppointmentUseCase {
-  constructor(private readonly appointmentRepository: IAppointmentRepository) {}
+  constructor(
+    private readonly appointmentRepository: IAppointmentRepository,
+    private readonly messagePublisher: IMessagePublisher
+  ) {}
 
   async execute(dto: CreateAppointmentDTO): Promise<AppointmentResponseDTO> {
     new InsuredId(dto.insuredId);
@@ -29,6 +33,18 @@ export class CreateAppointmentUseCase {
     );
 
     await this.appointmentRepository.save(appointment);
+
+    await this.messagePublisher.publish(
+      {
+        insuredId: dto.insuredId,
+        scheduleId: dto.scheduleId,
+        countryISO: dto.countryISO,
+        appointmentId,
+      },
+      {
+        countryISO: dto.countryISO,
+      }
+    );
 
     return {
       message: 'El agendamiento está en proceso',
