@@ -95,6 +95,15 @@ functions:
           arn: !GetAtt AppointmentsResponseQueue.Arn
           batchSize: 10
 
+  # Lambda para documentación Swagger
+  docs:
+    handler: src/presentation/handlers/docs.handler
+    events:
+      - http:
+          path: docs
+          method: get
+          cors: true
+
   # Lambda para procesar agendamientos de Perú
   appointmentPE:
     handler: src/presentation/handlers/appointment-pe.handler
