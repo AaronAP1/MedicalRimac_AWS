@@ -57,13 +57,7 @@ provider:
           Resource:
             - !Sub 'arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/${self:custom.eventBusName}'
 
-plugins:
-  - serverless-esbuild
-  - serverless-offline
-
-custom:
-  appointmentsTable: medical-appointments-${self:provider.stage}
-  eventBusName: medical-appointments-bus-${self:provider.stage}
+build:
   esbuild:
     bundle: true
     minify: false
@@ -71,8 +65,13 @@ custom:
     exclude:
       - aws-sdk
     target: node20
-    platform: node
-    concurrency: 10
+
+plugins:
+  - serverless-offline
+
+custom:
+  appointmentsTable: medical-appointments-${self:provider.stage}
+  eventBusName: medical-appointments-bus-${self:provider.stage}
 
 functions:
   # Lambda principal: recibe peticiones y maneja el ciclo completo
@@ -91,7 +90,6 @@ functions:
       - sqs:
           arn: !GetAtt AppointmentsResponseQueue.Arn
           batchSize: 10
-          maximumBatchingWindowInSeconds: 5
 
   # Lambda para procesar agendamientos de Perú
   appointmentPE:
@@ -100,7 +98,6 @@ functions:
       - sqs:
           arn: !GetAtt AppointmentsPEQueue.Arn
           batchSize: 10
-          maximumBatchingWindowInSeconds: 5
 
   # Lambda para procesar agendamientos de Chile
   appointmentCL:
@@ -109,7 +106,6 @@ functions:
       - sqs:
           arn: !GetAtt AppointmentsCLQueue.Arn
           batchSize: 10
-          maximumBatchingWindowInSeconds: 5
 
 resources:
   Resources:
@@ -228,7 +224,7 @@ resources:
       Type: AWS::SQS::QueuePolicy
       Properties:
         Queues:
-          - !GetAtt AppointmentsCLQueue
+          - !Ref AppointmentsCLQueue
         PolicyDocument:
           Statement:
             - Effect: Allow
